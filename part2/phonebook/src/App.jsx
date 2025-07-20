@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import phoneService from './service/phonebook'
-import axios from 'axios'
 
 const Filter = (props) => {
   return(
@@ -33,11 +32,32 @@ const Persons = ({showPersons}) => {
   )
 }
 
+const Notification = ({message}) => {
+    const notificationStyle = {
+      color: 'red',
+      background: 'lightgrey',
+      fontSize: '20px',
+      borderStyle: 'solid',
+      borderRadius: '5px',
+      padding: '10px',
+      marginBottom: '10px'
+    }
+    if (message === null) {
+      return null
+    }
+    return (
+      <div style={notificationStyle}>
+        {message}
+      </div>
+    )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [Message, setMessage] = useState(null)
 
   useEffect(() => {
     phoneService
@@ -57,7 +77,12 @@ const App = () => {
     }
 
     if (result) {
-      return alert(`${newName} is already added to phonebook`)
+      return (
+        setMessage(`${newName} is already added to phonebook`),
+        setTimeout(() => 
+          {setMessage(null)}, 5000
+        )
+      )
     }
     {
     phoneService
@@ -66,6 +91,10 @@ const App = () => {
         setPersons(persons.concat(returnedObject))
         setNewName('')
         setNewNumber('')
+        setMessage(`Added ${personObject.name}`)
+        setTimeout(() => 
+          {setMessage(null)}, 5000
+        )
       })
     }
   }
@@ -80,10 +109,6 @@ const App = () => {
     setFilter(event.target.value)
   }
 
-  // const removeNumber = (id) => {
-  //   axios.delete(`http://localhost:3001/persons/${id}`)
-  // }
-
   const showPersons = persons.filter((person) => person.name.toLowerCase().includes(filter))
 
   return (
@@ -93,6 +118,7 @@ const App = () => {
         <input value = {filter} onChange={handleFilterChange}/>
         }/>
       <h2>add a new</h2>
+      <Notification message = {Message}/>
       <PersonForm form = {
         <form onSubmit={addPerson}>
           <div> 

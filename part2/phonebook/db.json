@@ -19,6 +19,16 @@
       "id": "4",
       "name": "Mary Poppendieck",
       "number": "39-23-6423122"
+    },
+    {
+      "id": "5",
+      "name": "Buhari",
+      "number": "+234-419"
+    },
+    {
+      "id": "6",
+      "name": "Ojukwu",
+      "number": "0000"
     }
   ]
 }
