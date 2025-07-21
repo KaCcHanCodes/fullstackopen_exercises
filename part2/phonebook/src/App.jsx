@@ -1,63 +1,16 @@
 import { useState, useEffect } from 'react'
 import phoneService from './service/phonebook'
-
-const Filter = (props) => {
-  return(
-  <div>
-    filter shown with {props.input}
-  </div>
-  )
-}
-
-const PersonForm = ({form}) => <div>{form}</div>
-
-const Persons = ({showPersons}) => {
-  const removeNumber = (id) => {
-    const value = showPersons.find(person => person.id === id)
-    if (value) {
-      confirm(`Delete ${value.name}`)
-      phoneService.remove(id).catch(error => {
-          alert(`the number '${value.name}' was already deleted from server`)
-      })
-    }
-  }
-  return(
-    <div>
-      {showPersons.map(person => 
-      <div key = {person.id}>
-        {person.name} {person.number} <button onClick={() => removeNumber(person.id)}>delete</button>
-       </div>
-      )}
-    </div>
-  )
-}
-
-const Notification = ({message}) => {
-    const notificationStyle = {
-      color: 'red',
-      background: 'lightgrey',
-      fontSize: '20px',
-      borderStyle: 'solid',
-      borderRadius: '5px',
-      padding: '10px',
-      marginBottom: '10px'
-    }
-    if (message === null) {
-      return null
-    }
-    return (
-      <div style={notificationStyle}>
-        {message}
-      </div>
-    )
-}
+import Filter from './components/filter'
+import PersonForm from './components/personform'
+import Persons from './components/persons'
+import Notification from './components/notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [Message, setMessage] = useState(null)
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     phoneService
@@ -98,6 +51,17 @@ const App = () => {
       })
     }
   }
+
+  const removeNumber = (personId) => {
+    const value = showPersons.find(person => person.id === personId)
+    if (value) {
+      confirm(`Delete ${value.name}`)
+      phoneService.remove(personId).catch(error => {
+          alert(`the number '${value.name}' was already deleted from server`)
+      })
+      setPersons(persons.filter(person => person.id !== value.id ))
+    }
+  }
   
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -114,27 +78,13 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter input = {
-        <input value = {filter} onChange={handleFilterChange}/>
-        }/>
+      <Filter value = {filter} onChange={handleFilterChange}/>
       <h2>add a new</h2>
-      <Notification message = {Message}/>
-      <PersonForm form = {
-        <form onSubmit={addPerson}>
-          <div> 
-            name: <input value = {newName} onChange={handleNameChange}/>
-          </div>
-          <div>
-            number: <input value = {newNumber} onChange={handleNumberChange}/>
-          </div>
-          <div>
-            <button type="submit">add</button>
-          </div>
-        </form>
-        }
-      />
+      <Notification message = {message}/>
+      <PersonForm submit={addPerson} nameValue = {newName} onChangeName={handleNameChange} 
+      numberValue = {newNumber} onChangeNum={handleNumberChange}/>
       <h2>Numbers</h2>
-      <Persons showPersons = {showPersons}/>
+      <Persons showPersons = {showPersons} removeNumber = {removeNumber}/>
     </div>
   )
 }
