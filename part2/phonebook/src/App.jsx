@@ -30,11 +30,16 @@ const App = () => {
     }
 
     if (result) {
+      if (!window.confirm(`${newName} is already added to the phonebook, do you want to replace the old number with a new one?`)){
+        return
+      }
       return (
-        setMessage(`${newName} is already added to phonebook`),
-        setTimeout(() => 
-          {setMessage(null)}, 5000
-        )
+        phoneService
+        .update(result.id, personObject)
+        .then(returnedObject => {
+          setPersons(persons.map(person => 
+            person.id === result.id ? returnedObject : person))
+        })
       )
     }
     {
@@ -48,6 +53,11 @@ const App = () => {
         setTimeout(() => 
           {setMessage(null)}, 5000
         )
+      }).catch(error => {
+        setMessage(error.response.data.error)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000);
       })
     }
   }
@@ -55,9 +65,12 @@ const App = () => {
   const removeNumber = (personId) => {
     const value = showPersons.find(person => person.id === personId)
     if (value) {
-      confirm(`Delete ${value.name}`)
+      if(!window.confirm(`Delete ${value.name}`)){
+        return
+      }
       phoneService.remove(personId).catch(error => {
-          alert(`the number '${value.name}' was already deleted from server`)
+          setMessage(`the number '${value.name}' was already deleted from server`)
+          setTimeout(() => {setMessage(null)}, 5000)
       })
       setPersons(persons.filter(person => person.id !== value.id ))
     }
@@ -78,9 +91,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message = {message}/>
       <Filter value = {filter} onChange={handleFilterChange}/>
       <h2>add a new</h2>
-      <Notification message = {message}/>
       <PersonForm submit={addPerson} nameValue = {newName} onChangeName={handleNameChange} 
       numberValue = {newNumber} onChangeNum={handleNumberChange}/>
       <h2>Numbers</h2>
