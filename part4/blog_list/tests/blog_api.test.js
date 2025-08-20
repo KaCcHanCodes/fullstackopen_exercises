@@ -34,22 +34,22 @@ test('id is the unique identifier', async () => {
   assert.deepStrictEqual(response.body, initialBlog[0])
 })
 
-// test('successfully created a new blog post', async ()=> {
-//   const newBlog = {
-//     title: "First class tests",
-//     author: "Robert C. Martin",
-//     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-//     likes: 10
-//   }
-//   await api.post('/api/blogs')
-//           .send(newBlog,)
-//           .expect(201)
-//           .expect('Content-type', /application\/json/)
-//   const blogs = await api.get('/api/blogs')
-//   const title = blogs.body.map(t => t.title)
-//   assert(title.includes('First class tests'))
-//   assert.strictEqual(blogs.body.length, (initialBlog.length + 1))
-// })
+test('successfully created a new blog post', async ()=> {
+  const newBlog = {
+    title: "First class tests",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+    likes: 10
+  }
+  await api.post('/api/blogs')
+          .send(newBlog,)
+          .expect(201)
+          .expect('Content-type', /application\/json/)
+  const blogs = await api.get('/api/blogs')
+  const title = blogs.body.map(t => t.title)
+  assert(title.includes('First class tests'))
+  assert.strictEqual(blogs.body.length, (initialBlog.length + 1))
+})
 
 test('delete a blog post', async () => {
   const blogStart = await helper.blogsInDb()
